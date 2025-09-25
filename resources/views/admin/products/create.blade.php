@@ -10,7 +10,7 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label class="block text-sm font-medium text-gray-700">Product Name</label>
-          <input name="name" maxlength="70" class="mt-1 block w-full border rounded px-3 py-2" placeholder="Enter product name in 70 characters"/>
+          <input name="name" maxlength="100" class="mt-1 block w-full border rounded px-3 py-2" placeholder="Enter product name in 100 characters"/>
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700">Price (USD)</label>
@@ -25,12 +25,14 @@
           <input type="file" name="image" class="mt-1 block w-full" />
         </div>
 
-        <select>
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-gray-700">Category</label>
+          <select name="category" class="mt-1 block w-full border rounded px-3 py-2">
             @foreach ($categories as $cat)
-            <option class="mt-1 block w-full border rounded px-3 py-2" value="{{$cat->category}}">{{$cat->category}}</option>
-            {{-- <input name="category" class="mt-1 block w-full border rounded px-3 py-2" placeholder="Enter category name" /> --}}
+              <option value="{{ $cat->category }}">{{ $cat->category }}</option>
             @endforeach
-        </select>
+          </select>
+        </div>
 
       </div>
 

@@ -10,14 +10,14 @@ class AdminController extends Controller
 {
    public function addproducts()
    {
-        $categories=category::all();
-        return view('admin.products.create' , compact('categories'));
+       $categories = Category::all();
+       return view('admin.products.create', compact('categories'));
    }
 
-   public function store(Request $request)
-{
+    public function store(Request $request)
+    {
     $validated = $request->validate([
-        'name' => 'required|string|max:70',
+        'name' => 'required|string|max:100',
         'price' => 'required|numeric|min:0',
         'description' => 'nullable|string',
         'category' => 'nullable|string|max:100',
@@ -36,26 +36,74 @@ class AdminController extends Controller
         $image->move(public_path('product_images'), $imagename);
         $product->image = $imagename;
     }
-    $product->save();
-    return redirect()->route('admin.viewproducts')->with('success', 'Product added successfully!');
-
-    if($image && $product->save()){
-        $request->image->move('product_images',$image);
-    }
+        $product->save();
+        return redirect()->route('admin.viewproducts')->with('success', 'Product added successfully!');
 }
     public function viewproducts()
     {
-        $product=product::all();
-        return view('admin.products.index' , compact('product'));
+        $products = Product::orderBy('created_at', 'desc')->paginate(5);
+        $categories = Category::all();
+        return view('admin.products.index', compact('products', 'categories'));
     }
 
+    public function updateproduct($id)
+    {
+        $product = Product::findOrFail($id);
+        $categories = Category::all();
+        return view('admin.products.edit', compact('product', 'categories'));
+
+    }
+    public function postupdateproduct(Request $request, $id){
+
+        $product = Product::findOrFail($id);
+        $product->name = $request->name;
+        $product->price = $request->price;
+        $product->description = $request->description;
+        $product->category = $request->category;
+
+
+    $image = $request->file('image');
+    if ($image) {
+        $imagename = time() . '.' . $image->getClientOriginalExtension();
+        $image->move(public_path('product_images'), $imagename);
+        $product->image = $imagename;
+    }
+        $product->save();
+        return redirect()->route('admin.viewproducts')->with('success', 'Product updated successfully!');
+
+    }
+
+    // Update only the category for a product (used by inline select)
+    public function updateCategory(Request $request, $id)
+    {
+        $request->validate([
+            'category' => 'nullable|string|max:100'
+        ]);
+
+        $product = Product::findOrFail($id);
+        $product->category = $request->category;
+        $product->save();
+
+        return redirect()->back()->with('success', 'Product category updated');
+    }
     public function deleteproducts($id)
     {
-        $product=product::findOrFail($id);
+        $product = Product::findOrFail($id);
+        $imagePath = public_path('product_images/' . $product->image);
+        if (file_exists($imagePath)) {
+            unlink($imagePath); // Delete the image file
+        }
         $product->delete();
         return redirect()->back()->with('success', 'Deleted');
 
     }
+
+    public function viewProduct($id)
+    {
+        $product = Product::findOrFail($id);
+        return view('admin.products.view', compact('product'));
+}
+
 
     // category section
     public function addcategories()
@@ -64,19 +112,19 @@ class AdminController extends Controller
     }
     public function postaddcategories(request $request)
     {
-        $category=new category();
-        $category->category=$request->category;
+        $category = new Category();
+        $category->category = $request->category;
         $category->save();
         return redirect()->route('admin.viewcategories')->with('success', 'Product added');
     }
     public function viewcategories()
     {
-        $categories=category::all();
-        return view('admin.categories.index' , compact('categories'));
+        $categories = Category::all();
+        return view('admin.categories.index', compact('categories'));
     }
     public function deletecategories($id)
     {
-        $category=category::findOrFail($id);
+        $category = Category::findOrFail($id);
         $category->delete();
         return redirect()->back()->with('success', 'Deleted');
 

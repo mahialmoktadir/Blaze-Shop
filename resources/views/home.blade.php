@@ -1,85 +1,74 @@
 @extends('layouts.navbar')
 @section('content')
+    {{-- Hero Section --}}
     <section
-        class="bg-gradient-to-r from-red-600 via-orange-500 to-yellow-400 text-black py-32 text-center relative overflow-hidden">
-        <h1 class="text-5xl md:text-7xl font-extrabold drop-shadow-lg">🔥 Welcome to BLAZE Shop</h1>
-        <p class="text-lg md:text-2xl mt-4">Ignite Your Shopping Experience</p>
+        class="bg-gradient-to-r from-purple-700 via-pink-600 to-red-500 text-white py-32 text-center relative overflow-hidden">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_#ff512f,_transparent_60%)] opacity-50"></div>
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,_#dd2476,_transparent_60%)] opacity-50">
+        </div>
+
+        <h1 class="relative z-10 text-5xl md:text-7xl font-extrabold ">
+            Welcome to <span class="text-yellow-300">BLAZE</span> Shop
+        </h1>
+        <p class="relative z-10 text-lg md:text-2xl mt-4 text-gray-100">
+            Ignite Your Shopping Experience
+        </p>
         <a href="#shop"
-            class="mt-6 inline-block px-8 py-3 bg-black text-white rounded-lg hover:scale-105 transform transition duration-300 font-semibold">Shop
-            Now</a>
+            class="relative z-10 mt-6 inline-block px-10 py-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-black rounded-full hover:scale-110 transform transition duration-300 font-bold shadow-lg">
+            Shop Now
+        </a>
     </section>
 
+    {{-- Featured Products --}}
+    <section id="shop" class="py-20 max-w-7xl mx-auto px-6">
+        <h2
+            class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-black to-gray-400 mb-12 text-center drop-shadow-lg">
+            Featured Products
+        </h2>
 
-    <section id="shop" class="py-16 max-w-7xl mx-auto px-4">
-        <h2 class="text-3xl font-bold text-orange-500 mb-8 text-center">🔥 Featured Products</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            @foreach ($products as $p)
+                <div
+                    class="bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-2xl overflow-hidden shadow-xl hover:shadow-[0_0_25px_rgba(0,0,0,0.7)] hover:-translate-y-2 transform transition duration-300 flex flex-col border border-gray-700">
 
-            <div class="bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:scale-105 transform transition duration-300">
-                <img src="https://via.placeholder.com/400x250" alt="Product" class="w-full h-48 object-cover">
-                <div class="p-4">
-                    <h3 class="font-bold text-lg mb-2">Product 1</h3>
-                    <p class="text-gray-300 mb-2">$49.99</p>
-                    <button
-                        class="px-4 py-2 bg-orange-500 hover:bg-orange-400 rounded-lg font-semibold w-full transition">Buy
-                        Now</button>
+                    {{-- Product Image --}}
+                    <div class="relative bg-gray-900 flex items-center justify-center h-56">
+                        <img src="{{ asset('product_images/' . $p->image) }}" alt="{{ $p->name }}"
+                            class="w-full h-full rounded-2xl object-cover p-2">
+                        <span
+                            class="absolute top-2 right-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-bold text-sm px-3 py-1 rounded-full shadow-lg">
+                            ${{ $p->price }}
+                        </span>
+                    </div>
+
+
+                    {{-- Product Content --}}
+                    <div class="p-4 sm:p-5 flex-1 flex flex-col">
+                        <h3 class="font-bold text-sm sm:text-lg text-white mb-2">
+                            @if (strlen($p->name) > 50)
+                                {{ Str::limit($p->name, 50) }}
+                                <a href="{{ route('product.view', $p->id) }}"
+                                    class="text-pink-400 text-xs sm:text-sm font-medium hover:underline ml-1">See More</a>
+                            @else
+                                {{ $p->name }}
+                            @endif
+                        </h3>
+
+                        <p class="text-gray-400 text-xs sm:text-sm mb-3 line-clamp-2">
+                            {{ Str::limit($p->description, 80, '...') }}
+                        </p>
+
+                        <a href=""
+                            class="mt-auto inline-block px-3 sm:px-5 py-2 text-center bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-400 hover:to-indigo-500 text-white font-semibold rounded-lg transition shadow-md text-xs sm:text-base">
+                            Buy Now
+                        </a>
+                        <a href="{{ route('product.view', $p->id) }}"
+                            class="px-3 sm:px-5 py-2 bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-400 hover:to-red-400 text-center text-white rounded-lg font-semibold w-full transition mt-2 sm:mt-3 shadow-md text-xs sm:text-base">
+                            View Details
+                        </a>
+                    </div>
                 </div>
-            </div>
-            <div class="bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:scale-105 transform transition duration-300">
-                <img src="https://via.placeholder.com/400x250" alt="Product" class="w-full h-48 object-cover">
-                <div class="p-4">
-                    <h3 class="font-bold text-lg mb-2">Product 2</h3>
-                    <p class="text-gray-300 mb-2">$79.99</p>
-                    <button
-                        class="px-4 py-2 bg-orange-500 hover:bg-orange-400 rounded-lg font-semibold w-full transition">Buy
-                        Now</button>
-                </div>
-            </div>
-            <div class="bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:scale-105 transform transition duration-300">
-                <img src="https://via.placeholder.com/400x250" alt="Product" class="w-full h-48 object-cover">
-                <div class="p-4">
-                    <h3 class="font-bold text-lg mb-2">Product 3</h3>
-                    <p class="text-gray-300 mb-2">$99.99</p>
-                    <button
-                        class="px-4 py-2 bg-orange-500 hover:bg-orange-400 rounded-lg font-semibold w-full transition">Buy
-                        Now</button>
-                </div>
-            </div>
-            <div class="bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:scale-105 transform transition duration-300">
-                <img src="https://via.placeholder.com/400x250" alt="Product" class="w-full h-48 object-cover">
-                <div class="p-4">
-                    <h3 class="font-bold text-lg mb-2">Product 4</h3>
-                    <p class="text-gray-300 mb-2">$59.99</p>
-                    <button
-                        class="px-4 py-2 bg-orange-500 hover:bg-orange-400 rounded-lg font-semibold w-full transition">Buy
-                        Now</button>
-                </div>
-            </div>
+            @endforeach
         </div>
     </section>
-
-
-    <section class="py-16 bg-gray-800">
-        <div class="max-w-7xl mx-auto px-4 text-center">
-            <h2 class="text-3xl font-bold text-orange-500 mb-12">Why Choose BLAZE</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="bg-gray-700 rounded-lg p-6 hover:scale-105 transition">
-                    <h3 class="font-bold text-xl mb-2">Fast Delivery</h3>
-                    <p class="text-gray-300">Get your products quickly with our blazing fast delivery.</p>
-                </div>
-                <div class="bg-gray-700 rounded-lg p-6 hover:scale-105 transition">
-                    <h3 class="font-bold text-xl mb-2">Premium Quality</h3>
-                    <p class="text-gray-300">We provide only high-quality products for our customers.</p>
-                </div>
-                <div class="bg-gray-700 rounded-lg p-6 hover:scale-105 transition">
-                    <h3 class="font-bold text-xl mb-2">24/7 Support</h3>
-                    <p class="text-gray-300">Our team is always ready to help you anytime.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-
-    <footer class="bg-black bg-opacity-80 py-6 text-center">
-        <p class="text-gray-400">&copy; 2025 BLAZE Shop. All rights reserved.</p>
-    </footer>
 @endsection
