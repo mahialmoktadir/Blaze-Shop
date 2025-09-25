@@ -1,7 +1,7 @@
 @extends('layouts.navbar')
 
 @section('content')
-    <section class="max-w-7xl h-full mx-auto px-6 py-16">
+    <section class="max-w-7xl h-screen max-lg:h-full mx-auto px-6 py-16">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
 
             {{-- Product Image --}}
