@@ -3,12 +3,24 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\CartController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [UsersController::class, 'home'])->name('home');
 
 
 Route::get('/dashboard', [UsersController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
+// Route::get('/add_to_cart', [UsersController::class, 'addToCart'])->middleware(['auth', 'verified'])->name('add_to_cart');
+Route::get('/cart', [CartController::class, 'index'])->middleware(['auth', 'verified'])->name('cart.index');
+Route::post('/cart/add/{id}', [CartController::class, 'add'])->middleware(['auth', 'verified'])->name('cart.add');
+Route::put('/cart/update/{id}', [CartController::class, 'update'])->middleware(['auth', 'verified'])->name('cart.update');
+Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->middleware(['auth', 'verified'])->name('cart.remove');
+
+// Checkout route
+Route::get('/checkout', function () {
+    return view('cart.checkout');
+})->name('checkout');
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

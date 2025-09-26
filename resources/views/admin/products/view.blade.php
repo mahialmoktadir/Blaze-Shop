@@ -1,7 +1,7 @@
 @extends('layouts.navbar')
 
 @section('content')
-    <section class="max-w-7xl h-screen max-lg:h-full mx-auto px-6 py-16">
+    <section class="max-w-7xl max-lg:h-full mx-auto px-6 py-16">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
 
             {{-- Product Image --}}
@@ -55,10 +55,13 @@
 
                 {{-- Buttons --}}
                 <div class="flex gap-4">
-                    <button
-                        class="px-6 py-3 bg-gray-900 text-white font-semibold rounded-lg shadow-md hover:bg-black transition">
-                        Add to Cart
-                    </button>
+                    <form action="{{ route('cart.add', $product->id) }}" method="POST">
+                        @csrf
+                        <button type="submit" class="px-6 py-3 bg-gray-900 text-white font-semibold rounded-lg shadow-md hover:bg-black transition">
+                            Add to Cart
+                        </button>
+                    </form>
+
                     <button
                         class="px-6 py-3 bg-gray-100 text-gray-900 font-semibold rounded-lg shadow-md hover:bg-gray-200 transition">
                         Buy Now

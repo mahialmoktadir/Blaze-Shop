@@ -15,16 +15,29 @@
 
 <body class="bg-gray-100">
 
+    @php
+        // Determine cart count: prefer DB persisted cart for logged-in users, otherwise session
+        $cartCount = 0;
+        $sessionCart = session()->get('cart', []);
+        $sessionCount = collect($sessionCart)->sum('quantity');
+        if (\Illuminate\Support\Facades\Auth::check()) {
+            $dbCount = \App\Models\Productcart::where('user_id', \Illuminate\Support\Facades\Auth::id())->sum('quantity');
+            $cartCount = $dbCount > 0 ? $dbCount : $sessionCount;
+        } else {
+            $cartCount = $sessionCount;
+        }
+    @endphp
+
 
     <nav class="bg-white shadow-lg sticky top-0 z-50 transition duration-500">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
 
 
-                <div
+                <a href="{{route('dashboard')}}"
                     class="flex-shrink-0 text-2xl font-extrabold text-orange-600 cursor-pointer hover:scale-110 transform transition duration-300">
                     Shop<span class="text-gray-800">Blaze</span>
-                </div>
+            </a>
 
 
                 <div class="hidden md:flex flex-1 mx-6">
@@ -55,15 +68,17 @@
                     </ul>
 
 
-                    <button class="relative hover:scale-110 transition duration-300">
+                    <a href="{{route('cart.index')}}" class="relative hover:scale-110 transition duration-300">
                         <svg class="w-7 h-7 text-gray-700 hover:text-orange-600 transition duration-300" fill="none"
                             stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.2 6h12.4L17 13M7 13H3m10 9a1 1 0 100-2 1 1 0 000 2zm-6 0a1 1 0 100-2 1 1 0 000 2z" />
                         </svg>
-                        <span
-                            class="absolute -top-2 -right-2 bg-orange-600 text-white text-xs rounded-full px-1 animate-bounce">3</span>
-                    </button>
+                        @if($cartCount > 0)
+                            <span
+                                class="absolute -top-2 -right-2 bg-orange-600 text-white text-xs rounded-full px-2 animate-bounce">{{ $cartCount }}</span>
+                        @endif
+                    </a>
 
 
                     <button class="hover:scale-110 transition duration-300">
@@ -154,126 +169,134 @@
         </div>
     </nav>
     @yield('content')
-    {{-- Footer Section --}}
-    <footer class="bg-black text-gray-300 pt-20">
-        <div class="max-w-7xl mx-auto px-6">
+   <!-- Footer Section -->
+<footer class="bg-white text-gray-700 pt-16">
+    <div class="max-w-7xl mx-auto px-6">
 
-            {{-- Top Header --}}
-            <h2 class="text-5xl md:text-7xl font-extrabold text-white text-center mb-12 tracking-wide">
-                BLAZE SHOPING
-            </h2>
+        <!-- Top Header -->
+        <h2 class="text-4xl md:text-6xl font-extrabold text-gray-900 text-center mb-10 tracking-tight animate-fadeIn">
+            BLAZE SHOP
+        </h2>
 
-            {{-- Info Boxes --}}
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-                <div class="bg-gray-900 p-6 rounded-lg border border-gray-700">
-                    <h3 class="flex items-center text-lg font-bold mb-2 text-white">
-                        <span class="mr-2">📦</span> Shipping
-                    </h3>
-                    <p class="text-gray-400 text-sm">
-                        In-stock items shipped via White Glove or oversize will typically ship within 2–3 weeks of
-                        purchase,
-                        unless otherwise noted. Transit can take up to 14 business days.
-                    </p>
-                </div>
-
-                <div class="bg-gray-900 p-6 rounded-lg border border-gray-700">
-                    <h3 class="flex items-center text-lg font-bold mb-2 text-white">
-                        <span class="mr-2">🚚</span> Delivery
-                    </h3>
-                    <p class="text-gray-400 text-sm">
-                        Delivery requires an appointment and signature. A two-person team will bring the item inside,
-                        place
-                        it in your chosen room, assemble it, and remove packaging debris.
-                    </p>
-                </div>
-
-                <div class="bg-gray-900 p-6 rounded-lg border border-gray-700">
-                    <h3 class="flex items-center text-lg font-bold mb-2 text-white">
-                        <span class="mr-2">↩️</span> Returns
-                    </h3>
-                    <p class="text-gray-400 text-sm">
-                        Please verify that this item aligns with your requirements before purchase, as it does not
-                        qualify
-                        for free returns and incurs a 15% restocking fee.
-                    </p>
-                </div>
+        <!-- Info Boxes -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-14">
+            <div
+                class="bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition transform hover:-translate-y-1 animate-fadeIn">
+                <h3 class="flex items-center text-base font-bold mb-2 text-gray-900">
+                    <span class="mr-2">📦</span> Shipping
+                </h3>
+                <p class="text-gray-500 text-sm leading-relaxed">
+                    In-stock items typically ship within 2–3 weeks. Transit can take up to 14 business days.
+                </p>
             </div>
 
-            {{-- Bottom Links --}}
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10 border-t border-gray-800 pt-10 pb-6">
-                {{-- Social Media --}}
-                <div>
-                    <h4 class="text-white font-bold mb-4">Social Media</h4>
-                    <ul class="space-y-2 text-sm">
-                        <li><a href="#" class="hover:text-white transition">Facebook</a></li>
-                        <li><a href="#" class="hover:text-white transition">Pinterest</a></li>
-                        <li><a href="#" class="hover:text-white transition">Instagram</a></li>
-                        <li><a href="#" class="hover:text-white transition">TikTok</a></li>
-                    </ul>
-                </div>
-
-                {{-- Customer Support --}}
-                <div>
-                    <h4 class="text-white font-bold mb-4">Customer Support</h4>
-                    <ul class="space-y-2 text-sm">
-                        <li><a href="#" class="hover:text-white transition">Top Questions</a></li>
-                        <li><a href="#" class="hover:text-white transition">Start a Return</a></li>
-                        <li><a href="#" class="hover:text-white transition">Rug Guide</a></li>
-                        <li><a href="#" class="hover:text-white transition">Gift Card</a></li>
-                    </ul>
-                </div>
-
-                {{-- Company --}}
-                <div>
-                    <h4 class="text-white font-bold mb-4">The Company</h4>
-                    <ul class="space-y-2 text-sm">
-                        <li><a href="#" class="hover:text-white transition">Careers</a></li>
-                        <li><a href="#" class="hover:text-white transition">About Us</a></li>
-                        <li><a href="#" class="hover:text-white transition">Customer Reviews</a></li>
-                        <li><a href="#" class="hover:text-white transition">Accessibility</a></li>
-                    </ul>
-                </div>
-
-                {{-- Subscribe --}}
-                <div>
-                    <h4 class="text-white font-bold mb-4">Subscribe To Us!</h4>
-                    <p class="text-sm text-gray-400 mb-4">
-                        Sign Up For Our Email List And Receive 10% Off Your First Order.
-                    </p>
-                    <form class="flex items-center border border-gray-600 rounded overflow-hidden">
-                        <input type="email" placeholder="Your Email Address"
-                            class="w-full px-3 py-2 bg-transparent text-gray-200 placeholder-gray-400 focus:outline-none text-sm">
-                        <button type="submit"
-                            class="px-4 py-2 bg-yellow-400 text-black font-bold text-sm hover:bg-yellow-300">
-                            →
-                        </button>
-                    </form>
-                </div>
+            <div
+                class="bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition transform hover:-translate-y-1 animate-fadeIn delay-100">
+                <h3 class="flex items-center text-base font-bold mb-2 text-gray-900">
+                    <span class="mr-2">🚚</span> Delivery
+                </h3>
+                <p class="text-gray-500 text-sm leading-relaxed">
+                    Delivery requires an appointment and signature. Two-person team ensures safe delivery & setup.
+                </p>
             </div>
 
-            {{-- Bottom Copyright --}}
-            <div class="border-t border-gray-800 mt-8 pt-6 text-center text-gray-500 text-sm">
-                &copy; 2025 <span class="text-white">BLAZE Shop</span>. All rights reserved.
+            <div
+                class="bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition transform hover:-translate-y-1 animate-fadeIn delay-200">
+                <h3 class="flex items-center text-base font-bold mb-2 text-gray-900">
+                    <span class="mr-2">↩️</span> Returns
+                </h3>
+                <p class="text-gray-500 text-sm leading-relaxed">
+                    Returns are subject to a 15% restocking fee. Please review before purchase.
+                </p>
             </div>
         </div>
-    </footer>
-    <style>
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
 
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        <!-- Bottom Links -->
+        <div
+            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 border-t border-gray-200 pt-10 pb-6 animate-fadeIn">
+            <!-- Social Media -->
+            <div>
+                <h4 class="text-gray-900 font-bold mb-4">Social Media</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="#" class="hover:text-indigo-600 transition">Facebook</a></li>
+                    <li><a href="#" class="hover:text-indigo-600 transition">Pinterest</a></li>
+                    <li><a href="#" class="hover:text-indigo-600 transition">Instagram</a></li>
+                    <li><a href="#" class="hover:text-indigo-600 transition">TikTok</a></li>
+                </ul>
+            </div>
+
+            <!-- Customer Support -->
+            <div>
+                <h4 class="text-gray-900 font-bold mb-4">Customer Support</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="#" class="hover:text-indigo-600 transition">Top Questions</a></li>
+                    <li><a href="#" class="hover:text-indigo-600 transition">Start a Return</a></li>
+                    <li><a href="#" class="hover:text-indigo-600 transition">Rug Guide</a></li>
+                    <li><a href="#" class="hover:text-indigo-600 transition">Gift Card</a></li>
+                </ul>
+            </div>
+
+            <!-- Company -->
+            <div>
+                <h4 class="text-gray-900 font-bold mb-4">The Company</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="#" class="hover:text-indigo-600 transition">Careers</a></li>
+                    <li><a href="#" class="hover:text-indigo-600 transition">About Us</a></li>
+                    <li><a href="#" class="hover:text-indigo-600 transition">Customer Reviews</a></li>
+                    <li><a href="#" class="hover:text-indigo-600 transition">Accessibility</a></li>
+                </ul>
+            </div>
+
+            <!-- Subscribe -->
+            <div>
+                <h4 class="text-gray-900 font-bold mb-4">Subscribe To Us!</h4>
+                <p class="text-sm text-gray-500 mb-4">
+                    Sign up and get 10% off your first order.
+                </p>
+                <form action="{{route('register')}}" class="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+                    <input type="email" placeholder="Your Email Address"
+                        class="w-full px-3 py-2 bg-transparent text-gray-700 placeholder-gray-400 focus:outline-none text-sm" required>
+                    <button type="submit"
+                        class="px-4 py-2 bg-indigo-600 text-white font-bold text-sm hover:bg-indigo-500 transition">
+                        →
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Bottom Copyright -->
+        <div class="border-t border-gray-900  mt-8 py-6 text-center text-black text-sm">
+            &copy; 2025 <span class=" font-semibold">BLAZE Shop</span>. All rights reserved.
+        </div>
+    </div>
+</footer>
+
+<style>
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(15px);
         }
 
-        .animate-fadeIn {
-            animation: fadeIn 0.3s ease-in-out;
+        to {
+            opacity: 1;
+            transform: translateY(0);
         }
-    </style>
+    }
+
+    .animate-fadeIn {
+        animation: fadeIn 0.6s ease-in-out;
+    }
+
+    .delay-100 {
+        animation-delay: 0.2s;
+    }
+
+    .delay-200 {
+        animation-delay: 0.4s;
+    }
+</style>
+
 
 </body>
 

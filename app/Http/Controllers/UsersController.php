@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Productcart;
 class UsersController extends Controller
 {
     public function index () {
@@ -21,4 +22,5 @@ class UsersController extends Controller
         $products = Product::orderBy('created_at', 'desc')->get();
         return view('home', compact('products'));
     }
+
 }

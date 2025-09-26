@@ -100,6 +100,9 @@
                         Forgot your password?
                     </a>
                 @endif
+                <a href="{{ route('register') }}" class="text-sm text-gray-100 hover:text-gray-300 text-center">
+                    Don't have account? register
+                </a>
             </div>
         </form>
     </div>
