@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Order;
 
 class AdminController extends Controller
 {
@@ -73,7 +74,6 @@ class AdminController extends Controller
 
     }
 
-    // Update only the category for a product (used by inline select)
     public function updateCategory(Request $request, $id)
     {
         $request->validate([
@@ -129,4 +129,46 @@ class AdminController extends Controller
         return redirect()->back()->with('success', 'Deleted');
 
     }
+
+
+    // order
+            public function orderindex()
+        {
+            $orders = Order::with(['product', 'user'])->latest()->paginate(10);
+            return view('admin.orders.index', compact('orders'));
+        }
+
+        public function receive(Order $order)
+        {
+            $order->update(['status' => 'received']);
+            return redirect()->back()->with('success', 'Order marked as received.');
+        }
+
+        public function dashboard()
+        {
+            $totalUsers = User::count();
+            $totalOrders = Order::count();
+            $revenue = Order::sum('total');
+
+            $userOrders = User::withCount('orders')
+                            ->withMax('orders', 'created_at')
+                            ->get()
+                            ->map(function($user) {
+                                return (object)[
+                                    'name' => $user->name,
+                                    'email' => $user->email,
+                                    'total_orders' => $user->orders_count,
+                                    'last_order_date' => $user->orders_max_created_at ? $user->orders_max_created_at->format('Y-m-d H:i:s') : ''
+                                ];
+                            });
+
+            return view('admin.dashboard', compact('totalUsers', 'totalOrders', 'revenue', 'userOrders'));
+        }
+
+
+
 }
+
+
+
+

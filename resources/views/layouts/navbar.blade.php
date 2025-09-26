@@ -16,7 +16,6 @@
 <body class="bg-gray-100">
 
     @php
-        // Determine cart count: prefer DB persisted cart for logged-in users, otherwise session
         $cartCount = 0;
         $sessionCart = session()->get('cart', []);
         $sessionCount = collect($sessionCart)->sum('quantity');

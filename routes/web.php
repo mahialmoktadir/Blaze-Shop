@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\OrderController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [UsersController::class, 'home'])->name('home');
@@ -20,6 +21,15 @@ Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->middlewar
 Route::get('/checkout', function () {
     return view('cart.checkout');
 })->name('checkout');
+
+// Order submission and payment flow
+Route::post('/order/checkout', [OrderController::class, 'checkout'])->name('orders.checkout');
+Route::get('/order/payment', [OrderController::class, 'paymentPage'])->name('orders.payment');
+Route::post('/order/pay', [OrderController::class, 'processPayment'])->name('orders.pay');
+// Buy Now (single product quick checkout)
+Route::post('/buy/{id}', [OrderController::class, 'buyNow'])->name('orders.buy');
+// Backwards-compatible (not used by new flow)
+Route::post('/order', [OrderController::class, 'store'])->name('orders.store');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -47,6 +57,12 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('viewcategories', [AdminController::class, 'viewcategories'])->name('admin.viewcategories');
     Route::delete('deletecategories/{id}', [AdminController::class, 'deletecategories'])->name('admin.deletecategories');
 
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/admin/orders', [AdminController::class, 'orderindex'])->name('admin.orders.index');
+    Route::post('/admin/orders/{order}/receive', [AdminController::class, 'receive'])->name('admin.orders.receive');
+    
 });
 
 require __DIR__.'/auth.php';

@@ -62,10 +62,31 @@
                         </button>
                     </form>
 
-                    <button
+                    <button id="quickBuyBtn"
                         class="px-6 py-3 bg-gray-100 text-gray-900 font-semibold rounded-lg shadow-md hover:bg-gray-200 transition">
                         Buy Now
                     </button>
+                </div>
+
+                {{-- Inline Quick Payment (hidden initially) --}}
+                <div id="quickPayment" class="mt-6 bg-white p-4 rounded-lg shadow hidden">
+                    <h3 class="font-semibold mb-2">Quick Payment</h3>
+                    <form id="quickPaymentForm" method="POST" action="{{ route('orders.pay') }}">
+                        @csrf
+                        <div class="mb-2">
+                            <input type="email" name="order_email" placeholder="Email" class="w-full px-3 py-2 border rounded" required>
+                        </div>
+                        <div class="mb-2">
+                            <input type="text" name="order_phone" placeholder="Phone" class="w-full px-3 py-2 border rounded" required>
+                        </div>
+                        <div class="mb-2">
+                            <input type="text" name="order_address" placeholder="Address" class="w-full px-3 py-2 border rounded" required>
+                        </div>
+                        <div class="flex gap-2">
+                            <button type="button" id="quickCancel" class="px-4 py-2 bg-gray-200 rounded">Cancel</button>
+                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Pay Now</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -91,6 +112,43 @@
                     desc.classList.add('line-clamp-3');
                     btn.innerText = "See More";
                 }
+            });
+
+            // Quick Buy logic
+            const quickBuyBtn = document.getElementById('quickBuyBtn');
+            const quickPayment = document.getElementById('quickPayment');
+            const quickCancel = document.getElementById('quickCancel');
+
+            quickBuyBtn && quickBuyBtn.addEventListener('click', async () => {
+                quickBuyBtn.disabled = true;
+                try {
+                    const res = await fetch("{{ route('orders.buy', $product->id) }}", {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}',
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+
+                    if (res.ok) {
+                        // show the inline quick payment form
+                        quickPayment.classList.remove('hidden');
+                        quickPayment.scrollIntoView({ behavior: 'smooth' });
+                    } else {
+                        const body = await res.json().catch(() => ({}));
+                        alert(body.message || 'Could not initiate quick buy.');
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert('Network error');
+                } finally {
+                    quickBuyBtn.disabled = false;
+                }
+            });
+
+            quickCancel && quickCancel.addEventListener('click', () => {
+                quickPayment.classList.add('hidden');
             });
         </script>
     </section>

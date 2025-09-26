@@ -100,11 +100,26 @@
                         <span>Total Cost</span>
                         <span>${{ $totalPrice + 5 }}</span>
                     </div>
+                    <form action="{{ route('orders.checkout') }}" method="post" class="mt-6 border-t-2 border-gray-700 ">
+                        @csrf
+                        <div class="mt-5 mb-3 font-semibold text-xl   ">Fill out this form to order.</div>
+                        <input type="text" name="order_email" placeholder="Enter Your Email" class="block w-full text-center py-3 rounded-lg" >
+                        <input type="text" name="order_phone" placeholder="Enter Your phone"class="mt-2 block w-full text-center py-3 rounded-lg">
+                        <input type="text" name="order_address" placeholder="Enter Your address" class="mt-2 block w-full text-center py-3 rounded-lg">
+                        <div class="mt-3">
+                            <label class="inline-flex items-center mr-4">
+                                <input type="radio" name="payment_method" value="online" checked class="form-radio">
+                                <span class="ml-2">Pay Online</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="payment_method" value="cod" class="form-radio">
+                                <span class="ml-2">Cash on Delivery</span>
+                            </label>
+                        </div>
 
-                    <a href="{{ route('checkout') }}"
-                        class="mt-6 block w-full text-center py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow transition">
-                        Checkout
-                    </a>
+                        <button type="submit" class="mt-2 block w-full text-center py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow transition">Proceed</button>
+                    </form>
+
                 </div>
             </div>
         @endif

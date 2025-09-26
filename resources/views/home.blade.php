@@ -68,10 +68,12 @@
                         </form>
 
                         {{-- Buy Now --}}
-                        <a href=""
-                            class="mt-2 sm:mt-3 inline-block px-3 sm:px-5 py-2 text-center bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-400 hover:to-indigo-500 text-white font-semibold rounded-lg transition shadow-md text-xs sm:text-base transform hover:scale-105 duration-300 ease-in-out">
-                            Buy Now
-                        </a>
+                        <form action="{{ route('orders.buy', $p->id) }}" method="POST" class="mt-2 sm:mt-3">
+                            @csrf
+                            <button type="submit" class="w-full px-3 sm:px-5 py-2 text-center bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-400 hover:to-indigo-500 text-white font-semibold rounded-lg transition shadow-md text-xs sm:text-base transform hover:scale-105 duration-300 ease-in-out">
+                                Buy Now
+                            </button>
+                        </form>
                     </div>
                 </div>
             @endforeach

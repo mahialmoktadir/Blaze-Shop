@@ -14,7 +14,7 @@ class CartController extends Controller
     {
         $cart = session()->get('cart', []);
 
-        // If user is logged in, merge persisted DB cart items into the session cart
+
         if (Auth::check()) {
             $userId = Auth::id();
             $persisted = Productcart::where('user_id', $userId)->get();
@@ -22,7 +22,6 @@ class CartController extends Controller
                 $p = Product::find($pc->product_id);
                 if (!$p) continue;
                 if (isset($cart[$p->id])) {
-                    // prefer the larger quantity
                     $cart[$p->id]['quantity'] = max($cart[$p->id]['quantity'], $pc->quantity);
                 } else {
                     $cart[$p->id] = [
@@ -61,11 +60,11 @@ class CartController extends Controller
 
         session()->put('cart', $cart);
 
-        // If user is logged in, persist to productcarts table
+
         if (Auth::check()) {
             $userId = Auth::id();
 
-            // Find existing productcart for this user and product
+
             $pc = Productcart::where('user_id', $userId)->where('product_id', $product->id)->first();
             if ($pc) {
                 $pc->quantity = $pc->quantity + 1;
@@ -90,13 +89,12 @@ class CartController extends Controller
             $cart[$id]['quantity'] = $quantity;
             session()->put('cart', $cart);
 
-            // If user is logged in, update persisted quantity
+
             if (Auth::check()) {
                 $userId = Auth::id();
                 $pc = Productcart::where('user_id', $userId)->where('product_id', $id)->first();
                 if ($pc) {
-                    $pc->quantity = $quantity;
-                    // if quantity is zero or less, delete the record
+
                     if ($pc->quantity <= 0) {
                         $pc->delete();
                     } else {
@@ -116,7 +114,7 @@ class CartController extends Controller
             session()->put('cart', $cart);
         }
 
-        // Also remove persisted entry for authenticated users
+
         if (Auth::check()) {
             $userId = Auth::id();
             Productcart::where('user_id', $userId)->where('product_id', $id)->delete();

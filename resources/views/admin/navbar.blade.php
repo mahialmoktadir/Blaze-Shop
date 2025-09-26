@@ -12,7 +12,7 @@
 
 
     <aside id="sidebar"
-        class="fixed inset-y-0 left-0 w-64 bg-gradient-to-b from-orange-500 via-pink-500 to-purple-600 text-white transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-40">
+        class="fixed inset-y-0 left-0 w-64 bg-sky-700 text-white transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-40">
         <div class="p-4 text-2xl font-bold border-b border-white/20">
             🌐 Admin<span class="text-yellow-300">Panel</span>
         </div>
@@ -54,9 +54,55 @@
             <a href="#" class="flex items-center gap-3 p-2 rounded-md hover:bg-white/20 transition">
                 👥 <span>Users</span>
             </a>
-            <a href="#" class="flex items-center gap-3 p-2 rounded-md hover:bg-white/20 transition">
-                📦 <span>Orders</span>
-            </a>
+            @php
+                $ordersCount = \App\Models\Order::count();
+                $recentOrders = \App\Models\Order::latest()->take(6)->get();
+            @endphp
+
+            <div class="relative flex items-center">
+                <a href="{{ route('admin.orders.index') }}"
+                    class="flex-1 flex items-center gap-3 p-2 rounded-md hover:bg-white/20 transition">
+                    📦 <span class="ml-2">Orders</span>
+                </a>
+
+                <button id="ordersToggle" class="p-2 rounded-md hover:bg-white/20 transition ml-2">
+                    @if ($ordersCount > 0)
+                        <span class="bg-yellow-400 text-black text-xs rounded-full px-2">{{ $ordersCount }}</span>
+                    @endif
+                    <span id="ordersChevron" class="ml-2">▸</span>
+                </button>
+
+                <div id="ordersDropdown"
+                    class="absolute left-7 mt-2 w-80 bg-gray-900 text-white shadow-lg rounded-md hidden z-50 border border-gray-700">
+                    <div class="p-3 border-b border-gray-700 font-semibold text-gray-200">
+                        Recent Orders ({{ $ordersCount }})
+                    </div>
+                    <div class="max-h-64 overflow-auto">
+                        @forelse($recentOrders as $ro)
+                            <a href="{{ route('admin.orders.index') }}"
+                                class="block px-4 py-3 hover:bg-gray-800 border-b border-gray-700 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="font-medium text-gray-100">{{ $ro->receiver_email ?? 'Guest' }}</span>
+                                    <span class="text-gray-400">#{{ $ro->id }}</span>
+                                </div>
+                                <div class="text-gray-400 text-xs">
+                                    Qty: {{ $ro->quantity }} •
+                                    {{ \App\Models\Product::find($ro->product_id)->name ?? 'Product' }}
+                                </div>
+                            </a>
+                        @empty
+                            <div class="px-4 py-3 text-sm text-gray-400">No recent orders</div>
+                        @endforelse
+                    </div>
+                    <div class="p-2 text-center border-t border-gray-700">
+                        <a href="{{ route('admin.orders.index') }}"
+                            class="text-sm text-purple-400 hover:text-purple-300">
+                            View all orders
+                        </a>
+                    </div>
+                </div>
+
+            </div>
         </nav>
     </aside>
 
@@ -67,7 +113,7 @@
     <div class="flex-1 md:ml-64 flex flex-col min-h-screen">
 
 
-        <header class="bg-white shadow-md h-16 flex items-center justify-between px-4 sticky top-0 z-30">
+        <header class="bg-sky-200 shadow-md h-16 flex items-center justify-between px-4 sticky top-0 z-30">
 
             <button onclick="toggleSidebar()" class="md:hidden p-2 rounded-md hover:bg-gray-200">
                 ☰
@@ -223,6 +269,19 @@
 
                 setupDropdown('productsToggle', 'productsSubmenu', 'productsChevron');
                 setupDropdown('categoriesToggle', 'categoriesSubmenu', 'categoriesChevron');
+                // Orders dropdown toggle
+                const ordersToggle = document.getElementById('ordersToggle');
+                const ordersDropdown = document.getElementById('ordersDropdown');
+                if (ordersToggle && ordersDropdown) {
+                    ordersToggle.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        ordersDropdown.classList.toggle('hidden');
+                    });
+                    document.addEventListener('click', (e) => {
+                        if (!ordersDropdown.contains(e.target) && e.target !== ordersToggle) ordersDropdown
+                            .classList.add('hidden');
+                    });
+                }
             })();
         </script>
 
